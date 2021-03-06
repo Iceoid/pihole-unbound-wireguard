@@ -68,3 +68,103 @@ server:
     private-address: fd00::/8
     private-address: fe80::/10
 ```
+
+### Restart Unbound to apply Configuration
+`sudo service unbound restart`
+
+### Disable Forwarding DNS in PiHole
+
+### Set Custom DNS in PiHole
+`127.0.0.1#5335`
+
+
+# Install wireguard
+
+## *On the Server side:*
+### Make sure system is up to date
+`sudo apt update && sudo apt upgrade -y`
+
+### Enable IP Forwarding by editing /etc/sysctl.conf
+`sudo nano /etc/sysctl.conf`
+
+### Uncomment the line _net.ipv4.ip_forward=1_ (*following command needs to be tested.*)
+`sudo sed -i 's/#net\.ipv4\.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf`
+
+### Apply settings
+`sudo sysctl -p`
+
+### Install wireguard
+`sudo apt install wireguard`
+
+### Generate keys
+`wg genkey | sudo tee /etc/wireguard/privatekey | wg pubkey | sudo tee /etc/wireguard/publickey`
+
+### Create config file
+`sudo nano /etc/wireguard/wg0.conf`
+
+### Add this to the file
+```
+[Interface]
+PrivateKey = <Your Private Key Goes Here>
+Address = 192.168.69.1/24
+ListenPort = 51820
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+```
+### _You need to replace the PrivateKey with yours and replace eth0 with your interface name_
+### You can check what your interface is by typing `ip a` and figuring out which one you want to use.
+
+### Test that the config is OK by bringing up the wg0 interface. Bring it down afterwards.
+```
+sudo wg-quick up wg0
+sudo wg-quick down wg0
+```
+### You can enable it on boot
+`sudo systemctl enable wg-quick@wg0`
+
+## *On the Client side:*
+
+### Install wireguard and create keys (Linux exemple)
+```
+sudo apt install wireguard
+wg genkey | sudo tee /etc/wireguard/privatekey | wg pubkey | sudo tee /etc/wireguard/publickey
+```
+
+### Copy the public key of the client in the config file of the server. It should now look like this (server-side):
+```
+[Interface]
+ PrivateKey = <This Ubuntu Servers Private Key>
+ Address = 192.168.69.1/24
+ PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+ PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+ ListenPort = 51820
+ 
+
+[Peer]
+# Test Debian Client
+ PublicKey=<The Public Key of the Debian Client>
+ AllowedIPs=192.168.69.2 # This is the given IP of the client
+ PersistentKeepalive=25 # You might want to comment or remove this line if you don't need to have a keepalive
+```
+
+### Create a config file on the client
+`sudo nano /etc/wireguard/wg-client.conf`
+```
+[Interface]
+PrivateKey = <This Debian Client Private Key Goes Here>
+ Address=192.168.69.2/24
+
+[Peer]
+# Ubuntu Server
+ PublicKey=<Public Key From Ubuntu Server>
+ Endpoint=<Public IP of Ubuntu Server>:51820
+ AllowedIPs = 0.0.0.0/0 # Forward all traffic to server
+```
+
+### Recommended: enable ufw firewall
+```
+sudo ufw allow 22/tcp
+sudo ufw allow 51820/udp
+sudo ufw allow 53
+ufw enable
+```
