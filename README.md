@@ -12,7 +12,7 @@
 ### Create Unbound Configuration File
 `sudo nano /etc/unbound/unbound.conf.d/pi-hole.conf`
 
-### Copy example config from https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqbGctSGkxTUduUjkzX1lWNko4N3JiQUlidWIwQXxBQ3Jtc0ttekZJX1pSdHR2WElkRGhoVDFTaTBBZ21vN3V1THN0SjJuT1dDeGp5SWNCY0dVRjExM3ZZWTgxUkRDV2NGM0dwLVpHajlDdm42bUJ6NVdRdE9UYWlvRnlaWThsMDc5MEtxQVh3REhzYU9GMThnQ1VuTQ&q=https%3A%2F%2Fdocs.pi-hole.net%2Fguides%2Fdns%2Funbound%2F
+### Copy example config from https://docs.pi-hole.net/guides/dns/unbound/
 ```
 server:
     # If no logfile is specified, syslog is used
