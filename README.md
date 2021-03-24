@@ -86,10 +86,10 @@ server:
 
 ### Enable IP Forwarding by editing /etc/sysctl.conf
 
-## Manually: Uncomment the line _net.ipv4.ip_forward=1_
+#### Manually: Uncomment the line _net.ipv4.ip_forward=1_
 `sudo nano /etc/sysctl.conf`
 
-## By replacing the line with sed
+#### By replacing the line with sed
 `sudo sed -i 's/#net\.ipv4\.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf`
 
 ### Apply settings
