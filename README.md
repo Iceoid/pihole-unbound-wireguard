@@ -85,9 +85,11 @@ server:
 `sudo apt update && sudo apt upgrade -y`
 
 ### Enable IP Forwarding by editing /etc/sysctl.conf
+
+## Manually: Uncomment the line _net.ipv4.ip_forward=1_
 `sudo nano /etc/sysctl.conf`
 
-### Uncomment the line _net.ipv4.ip_forward=1_ (*following command needs to be tested.*)
+## By replacing the line with sed
 `sudo sed -i 's/#net\.ipv4\.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf`
 
 ### Apply settings
