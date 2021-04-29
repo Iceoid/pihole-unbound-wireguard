@@ -77,7 +77,7 @@ server:
 ### Set Custom DNS in PiHole
 `127.0.0.1#5335`
 
-### Set DNS to listen to all interfaces
+### Set Pi-Hole to listen on all interfaces
 
 # Install wireguard
 
